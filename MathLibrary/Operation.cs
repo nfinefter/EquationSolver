@@ -9,7 +9,7 @@ using OperationFunc = System.Func<float, float, float>;
 namespace MathLibrary
 {
 
-    public class Operation
+    public class Operation : Token
     {
 
         public static Dictionary<char, OperationFunc> Operations = new()
@@ -20,8 +20,8 @@ namespace MathLibrary
             ['/'] = (num1, num2) => num1 / num2,
         };
 
-        OperationFunc myFunc;
-        public bool Parse(char currChar) => Operations.TryGetValue(currChar, out myFunc);
+        public OperationFunc myFunc;
+        public override bool Parse(char currChar) =>  myFunc == null && Operations.TryGetValue(currChar, out myFunc);
 
     }
 }

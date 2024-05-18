@@ -6,26 +6,19 @@ using System.Threading.Tasks;
 
 namespace MathLibrary
 {
-    public static class Number
+    public class Number : Token
     {
-        public static float Parse(ref int currentIndex, string equation)
+        public float Num = 0;
+        public override bool Parse(char currChar)
         {
-            int powCount = 0;
-            float Num = 0;
-            for (currentIndex = equation.Length - 1; currentIndex >= 0; currentIndex--)
+            if (currChar >= '0' && currChar <= '9')
             {
-                if (equation[currentIndex] >= '0' && equation[currentIndex] <= '9')
-                {
-                    Num += (float)(int.Parse(equation[currentIndex].ToString()) * Math.Pow(10, powCount));
-                    powCount++;
-                }
-                else
-                {
-                    break;
-                }
+                Num *= 10;
+                Num += (float)int.Parse(currChar.ToString());
+                return true;
             }
+            return false;
 
-            return Num;
         }
     }
 }

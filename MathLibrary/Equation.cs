@@ -3,17 +3,25 @@
 
     public class Equation
     {
-       
+
+        List<Token> equationList;
 
         string equation;
-        float Num1;
-        float Num2;
-        char Op;
-        public Equation (string equation)
+        Number Num1;
+        Number Num2;
+        Operation Op;
+        public Equation(string equation)
         {
             this.equation = equation;
+
+            equationList = new()
+            {
+               (Num1 = new Number()),
+                (Op = new Operation()),
+                (Num2 = new Number())
+            };
         }
-        public Equation (char oper, float num1, float num2)
+        public Equation(char oper, float num1, float num2)
         {
 
         }
@@ -28,27 +36,22 @@
         //    }
         //    return false;
         //}
-
         public float ParseEquation()
         {
+            int listIndex = 0;
             Operation currentOp = new();
             for (int i = 0; i < equation.Length; i++)
             {
                 if (equation[i] != ' ')
                 {
-                    //error, finished, continue
-                    if (currentOp.Parse(equation[i]))
+                    if(!equationList[listIndex].Parse(equation[i]))
                     {
-
+                        listIndex++;
+                        i--;
                     }
                 }
             }
-
-            int index = equation.Length - 1;
-            Num2 = Number.Parse(ref index, equation);
-            Op = Operation.Parse(ref index, equation);
-            Num1 = Number.Parse (ref index, equation);
-            return Operation.Operations[Op].Invoke(Num1, Num2);
+            return Op.myFunc.Invoke(Num1.Num, Num2.Num);
         }
 
     }
