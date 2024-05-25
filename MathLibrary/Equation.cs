@@ -5,7 +5,11 @@
     {
 
         List<Token> equationList;
-
+        List<Token> checkingTokens = new()
+        {
+            new Number(),
+            new Operation()
+        };
         string equation;
         Number Num1;
         Number Num2;
@@ -14,12 +18,13 @@
         {
             this.equation = equation;
 
-            equationList = new()
-            {
-               (Num1 = new Number()),
-                (Op = new Operation()),
-                (Num2 = new Number())
-            };
+            //equationList = new()
+            //{
+            //   (Num1 = new Number()),
+            //    (Op = new Operation()),
+            //    (Num2 = new Number())
+            //};
+
         }
         public Equation(char oper, float num1, float num2)
         {
@@ -38,16 +43,13 @@
         //}
         public float ParseEquation()
         {
-            int listIndex = 0;
-            Operation currentOp = new();
             for (int i = 0; i < equation.Length; i++)
             {
-                if (equation[i] != ' ')
+                for (int j = 0; j < checkingTokens.Count; j++)
                 {
-                    if(!equationList[listIndex].Parse(equation[i]))
+                    if (!checkingTokens[j].Parse(equation[i]))
                     {
-                        listIndex++;
-                        i--;
+                        
                     }
                 }
             }

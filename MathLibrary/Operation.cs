@@ -21,7 +21,7 @@ namespace MathLibrary
         };
 
         public OperationFunc myFunc;
-        public override bool Parse(char currChar) =>  myFunc == null && Operations.TryGetValue(currChar, out myFunc);
+        public override bool Parse(char currChar) => Possible = Complete = myFunc == null && Operations.TryGetValue(currChar, out myFunc);
 
     }
 }
