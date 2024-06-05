@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -8,10 +9,13 @@ namespace MathLibrary
 {
     public class Number : Token
     {
+
+
         int digit = 0;
         public float Num = 0;
-        public override bool Parse(char currChar)
+        public override States Parse(char currChar)
         {
+            States state;
 
             if (digit == 0)
             {
@@ -29,14 +33,24 @@ namespace MathLibrary
                 Num += (float)int.Parse(currChar.ToString());
                 Possible = true;
                 Complete = true;
-                return true;
-                
+
             }
+            else
+            {
+                Possible = false;
+                Complete = false;
+            }
+            return Possible ? States.Possible : States.None | (Complete ? States.Complete : States.None);
+        }
+        public override void Cleanse()
+        {
+            digit = 0;
+            Num = 0;
             Possible = false;
             Complete = false;
-            Fail = true;
-            return false;
-
         }
     }
 }
+
+
+

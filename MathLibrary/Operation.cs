@@ -21,7 +21,12 @@ namespace MathLibrary
         };
 
         public OperationFunc myFunc;
-        public override bool Parse(char currChar) => Possible = Complete = myFunc == null && Operations.TryGetValue(currChar, out myFunc);
+        public override States Parse(char currChar) => (Possible = Complete = myFunc == null && Operations.TryGetValue(currChar, out myFunc)) ? States.Valid : States.None;
 
+        public override void Cleanse()
+        {
+            Possible = false;
+            Complete = false;
+        }
     }
 }

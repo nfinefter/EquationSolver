@@ -6,11 +6,26 @@ using System.Threading.Tasks;
 
 namespace MathLibrary
 {
+    [Flags]
+    public enum States
+    {
+        None = 0,
+        Possible = 1,
+        Complete = 2,
+
+        Valid = Possible | Complete
+    }
     public abstract class Token
     {
         public bool Possible { get; protected set; } = false;
         public bool Complete { get; protected set; } = false;
-        public abstract bool Parse(char currChar);
+
+        //public static explicit operator States(Token token)
+        //{
+          
+        //}
+
+        public abstract States Parse(char currChar);
+        public abstract void Cleanse();
     }
 }
-    

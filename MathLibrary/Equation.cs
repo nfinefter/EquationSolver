@@ -8,7 +8,7 @@
         List<Token> checkingTokens = new()
         {
             new Number(),
-            new Operation()
+            new Operation() 
         };
         string equation;
         Number Num1;
@@ -43,16 +43,32 @@
         //}
         public float ParseEquation()
         {
+
+            int index = -1;
             for (int i = 0; i < equation.Length; i++)
             {
+                bool checkTokens = true;
                 for (int j = 0; j < checkingTokens.Count; j++)
                 {
-                    if (!checkingTokens[j].Parse(equation[i]))
+                    if (checkingTokens[j].Parse(equation[i]) == States.None)
                     {
-                        
+                        checkTokens = false;
+                    }   
+                    else if (checkingTokens[j].Parse(equation[i]) == States.Complete)
+                    {
+                        index = j;
+                    }
+                }
+                if (checkTokens)
+                {
+                    equationList.Add(checkingTokens[index]);
+                    for (int j = 0; j < checkingTokens.Count; j++)
+                    {
+                        checkingTokens[j].Cleanse();
                     }
                 }
             }
+
             return Op.myFunc.Invoke(Num1.Num, Num2.Num);
         }
 
