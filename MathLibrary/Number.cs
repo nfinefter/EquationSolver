@@ -38,15 +38,15 @@ namespace MathLibrary
             else
             {
                 Possible = false;
-                Complete = false;
+                Complete = true;
             }
-            return Possible ? States.Possible : States.None | (Complete ? States.Complete : States.None);
+            return (Possible ? States.Possible : States.None) | (Complete ? States.Complete : States.None);
         }
         public override void Cleanse()
         {
             digit = 0;
             Num = 0;
-            Possible = false;
+            Possible = true;
             Complete = false;
         }
     }

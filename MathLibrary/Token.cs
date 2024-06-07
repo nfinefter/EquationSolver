@@ -17,7 +17,7 @@ namespace MathLibrary
     }
     public abstract class Token
     {
-        public bool Possible { get; protected set; } = false;
+        public bool Possible { get; protected set; } = true;
         public bool Complete { get; protected set; } = false;
 
         //public static explicit operator States(Token token)

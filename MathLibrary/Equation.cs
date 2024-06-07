@@ -4,16 +4,18 @@
     public class Equation
     {
 
-        List<Token> equationList;
+        List<Token> equationList = new List<Token>();
         List<Token> checkingTokens = new()
         {
             new Number(),
-            new Operation() 
+            new Operation()
         };
         string equation;
         Number Num1;
         Number Num2;
         Operation Op;
+        float answer = 0;
+        int index = -1;
         public Equation(string equation)
         {
             this.equation = equation;
@@ -43,33 +45,38 @@
         //}
         public float ParseEquation()
         {
-
-            int index = -1;
-            for (int i = 0; i < equation.Length; i++)
+            for (int j = 0; j < equation.Length;j++)
             {
-                bool checkTokens = true;
-                for (int j = 0; j < checkingTokens.Count; j++)
+                bool allTokensFinished = true;
+                for (int i = 0; i < checkingTokens.Count; i++)
                 {
-                    if (checkingTokens[j].Parse(equation[i]) == States.None)
+                    if (!checkingTokens[i].Possible)
                     {
-                        checkTokens = false;
-                    }   
-                    else if (checkingTokens[j].Parse(equation[i]) == States.Complete)
-                    {
-                        index = j;
+                        continue;
                     }
+                    var checkParse = checkingTokens[i].Parse(equation[j]);
+                    if (checkParse.HasFlag(States.Possible))
+                    {
+                        allTokensFinished = false;
+                        if (checkParse.HasFlag(States.Complete))
+                        {
+                            index = i;
+                        }
+                    }        
                 }
-                if (checkTokens)
+                if (allTokensFinished)
                 {
                     equationList.Add(checkingTokens[index]);
-                    for (int j = 0; j < checkingTokens.Count; j++)
-                    {
-                        checkingTokens[j].Cleanse();
-                    }
+                    j--;
+                    checkingTokens[index].Cleanse();
                 }
             }
+            for (int i = 0; i < equationList.Count; i++)
+            {
 
-            return Op.myFunc.Invoke(Num1.Num, Num2.Num);
+            }
+
+            return answer;
         }
 
     }
