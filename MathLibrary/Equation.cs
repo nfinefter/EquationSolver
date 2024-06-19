@@ -1,4 +1,6 @@
-﻿namespace MathLibrary
+﻿using System.Numerics;
+
+namespace MathLibrary
 {
 
     public class Equation
@@ -11,9 +13,6 @@
             new Operation()
         };
         string equation;
-        Number Num1;
-        Number Num2;
-        Operation Op;
         float answer = 0;
         int index = -1;
         public Equation(string equation)
@@ -26,10 +25,6 @@
             //    (Op = new Operation()),
             //    (Num2 = new Number())
             //};
-
-        }
-        public Equation(char oper, float num1, float num2)
-        {
 
         }
         //public bool ErrorCheck()
@@ -46,7 +41,7 @@
         public float ParseEquation()
         {
             for (int j = 0; j < equation.Length;j++)
-            {
+            {                
                 bool allTokensFinished = true;
                 for (int i = 0; i < checkingTokens.Count; i++)
                 {
@@ -66,18 +61,47 @@
                 }
                 if (allTokensFinished)
                 {
-                    equationList.Add(checkingTokens[index]);
+                    ConcludeToken();
                     j--;
-                    checkingTokens[index].Cleanse();
                 }
             }
-            for (int i = 0; i < equationList.Count; i++)
+            ConcludeToken();
+            if(VerifyTypes())
             {
+                 answer = ((Number)equationList[0]).Num;
+                for (int i = 0; i < equationList.Count; i++)
+                {
 
+                    if (equationList[i].GetType() == typeof(Operation)) 
+                    {
+                        
+                        answer = equationList[i].Compute(equationList[i + 1], answer);
+                    }
+                }
             }
+
+           
 
             return answer;
         }
-
+        public void ConcludeToken()
+        {
+            equationList.Add(checkingTokens[index].Clone());
+            for (int i = 0; i < checkingTokens.Count; i++)
+            {
+                checkingTokens[i].Cleanse();
+            }
+        }
+        public bool VerifyTypes()
+        {
+            for (int i = 1; i < equationList.Count; i++)
+            {
+                if (equationList[i -1].GetType() == equationList[i].GetType())
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
     }
 }

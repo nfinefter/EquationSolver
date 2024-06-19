@@ -49,6 +49,26 @@ namespace MathLibrary
             Possible = true;
             Complete = false;
         }
+
+        protected void CloneLogic(Number replacemnt)
+        {
+            base.CloneLogic(replacemnt);
+        }
+
+        public override Number Clone()
+        {
+            Number copy = new Number();
+            CloneLogic(copy);
+            copy.Num = Num;
+            copy.digit = digit;
+
+            return copy;
+        }
+
+        public override float Compute(Token nextToken, float currentValue)
+        {
+            return Num;
+        }
     }
 }
 

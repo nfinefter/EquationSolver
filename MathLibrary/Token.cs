@@ -27,5 +27,14 @@ namespace MathLibrary
 
         public abstract States Parse(char currChar);
         public abstract void Cleanse();
+
+        protected virtual void CloneLogic(Token replacemnt)
+        {
+            replacemnt.Possible = Possible;
+            replacemnt.Complete = Complete;
+        }
+        public abstract float Compute(Token nextToken, float currentValue);
+
+        public abstract Token Clone();
     }
 }

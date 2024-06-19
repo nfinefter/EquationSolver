@@ -25,8 +25,27 @@ namespace MathLibrary
 
         public override void Cleanse()
         {
-            Possible = false;
+            Possible = true;
             Complete = false;
+            myFunc = null;
+        }
+        protected void CloneLogic(Operation replacemnt)
+        {
+            base.CloneLogic(replacemnt);
+        }
+
+        public override Operation Clone()
+        {
+            Operation copy = new Operation();
+            CloneLogic(copy);
+            copy.myFunc = myFunc;
+
+            return copy;
+        }
+
+        public override float Compute(Token nextToken, float currentValue)
+        {
+            return myFunc.Invoke(currentValue, ((Number)nextToken).Num);
         }
     }
 }
