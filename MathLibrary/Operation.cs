@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -12,17 +13,27 @@ namespace MathLibrary
     public class Operation : Token
     {
 
-        public static Dictionary<char, OperationFunc> Operations = new()
+        public static Dictionary<char, (OperationFunc, Priority)> Operations = new()
         {
-            ['+'] = (num1, num2) => num1 + num2,
-            ['-'] = (num1, num2) => num1 - num2,
-            ['*'] = (num1, num2) => num1 * num2,
-            ['/'] = (num1, num2) => num1 / num2,
+            ['+'] = ((num1, num2) => num1 + num2, Priority.Addition),
+            ['-'] = ((num1, num2) => num1 - num2, Priority.Subtraction),
+            ['*'] = ((num1, num2) => num1 * num2, Priority.Multiplication),
+            ['/'] = ((num1, num2) => num1 / num2, Priority.Division),
+            ['^'] = (MathF.Pow, Priority.Exponent),
         };
-
+        
         public OperationFunc myFunc;
-        public override States Parse(char currChar) => (Possible = Complete = myFunc == null && Operations.TryGetValue(currChar, out myFunc)) ? States.Valid : States.None;
-
+        public override States Parse(char currChar)
+        {
+            if (Possible = Complete = myFunc == null & Operations.TryGetValue(currChar, out var result))
+            {
+                (myFunc, Priority) = result;
+                return States.Valid;
+            }
+            else return States.None;
+           
+            
+        }
         public override void Cleanse()
         {
             Possible = true;

@@ -10,7 +10,8 @@ namespace MathLibrary
         List<Token> checkingTokens = new()
         {
             new Number(),
-            new Operation()
+            new Operation(),
+            new WhiteSpace()
         };
         string equation;
         float answer = 0;
@@ -40,8 +41,8 @@ namespace MathLibrary
         //}
         public float ParseEquation()
         {
-            for (int j = 0; j < equation.Length;j++)
-            {                
+            for (int j = 0; j < equation.Length; j++)
+            {
                 bool allTokensFinished = true;
                 for (int i = 0; i < checkingTokens.Count; i++)
                 {
@@ -57,7 +58,7 @@ namespace MathLibrary
                         {
                             index = i;
                         }
-                    }        
+                    }
                 }
                 if (allTokensFinished)
                 {
@@ -66,21 +67,34 @@ namespace MathLibrary
                 }
             }
             ConcludeToken();
-            if(VerifyTypes())
+            for (int i = 0; i < equationList.Count; i++)
             {
-                 answer = ((Number)equationList[0]).Num;
-                for (int i = 0; i < equationList.Count; i++)
+                if (equationList[i] is WhiteSpace)
                 {
-
-                    if (equationList[i].GetType() == typeof(Operation)) 
-                    {
-                        
-                        answer = equationList[i].Compute(equationList[i + 1], answer);
-                    }
+                    equationList.RemoveAt(i);
                 }
             }
+            ShuntingYard(equationList);
 
-           
+
+            //if (VerifyTypes())
+            //{
+            //    answer = ((Number)equationList[0]).Num;
+            //    for (int i = 0; i < equationList.Count; i++)
+            //    {
+
+            //        if (equationList[i] is Operation)
+            //        {
+            //            answer = equationList[i].Compute(equationList[i + 1], answer);
+            //        }
+            //    }
+            //}
+            //else
+            //{
+            //    throw new Exception("Invalid Equation");
+            //}
+
+
 
             return answer;
         }
@@ -96,12 +110,54 @@ namespace MathLibrary
         {
             for (int i = 1; i < equationList.Count; i++)
             {
-                if (equationList[i -1].GetType() == equationList[i].GetType())
+                if (equationList[i - 1].GetType() == equationList[i].GetType())
                 {
                     return false;
                 }
             }
             return true;
+        }
+        public float ParseTheYard(List<Token> ParsedList)
+        {
+            float answer = 0;
+
+            for (int i = 0; i < ParsedList.Count; i++)
+            {
+                if (ParsedList[i] is Operation)
+                {
+
+                }
+            }
+
+            return answer;
+        }
+        public List<Token> ShuntingYard(List<Token> unParsedList)
+        {
+            List<Token> output = new();
+            Stack<Token> opStack = new();
+
+            for (int i = 0; i < unParsedList.Count; i++)
+            {
+                if (unParsedList[i] is Number)
+                {
+                    output.Add(unParsedList[i]);
+                }
+                else if (unParsedList[i] is Operation)
+                {
+                    if (opStack.Count != 0 && opStack.Peek().Priority >= unParsedList[i].Priority)
+                    {
+                        output.Add(opStack.Pop());
+                    }
+                    opStack.Push(unParsedList[i]);
+                }
+
+            }
+            while (opStack.Count > 0)
+            {
+                output.Add(opStack.Pop());
+            }
+
+            return output;
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -15,8 +16,18 @@ namespace MathLibrary
 
         Valid = Possible | Complete
     }
+    public enum Priority
+    {
+        Number = 0,
+        Addition = 1,
+        Subtraction = 1,
+        Multiplication = 2,
+        Division = 2,
+        Exponent = 3
+    }
     public abstract class Token
     {
+        public Priority Priority;
         public bool Possible { get; protected set; } = true;
         public bool Complete { get; protected set; } = false;
 
@@ -32,6 +43,7 @@ namespace MathLibrary
         {
             replacemnt.Possible = Possible;
             replacemnt.Complete = Complete;
+            replacemnt.Priority = Priority;
         }
         public abstract float Compute(Token nextToken, float currentValue);
 

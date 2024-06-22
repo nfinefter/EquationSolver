@@ -10,7 +10,7 @@ namespace MathLibrary
     public class Number : Token
     {
 
-
+        
         int digit = 0;
         public float Num = 0;
         public override States Parse(char currChar)
