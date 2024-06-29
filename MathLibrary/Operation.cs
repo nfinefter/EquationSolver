@@ -21,12 +21,13 @@ namespace MathLibrary
             ['/'] = ((num1, num2) => num1 / num2, Priority.Division),
             ['^'] = (MathF.Pow, Priority.Exponent),
         };
-        
+        char op;
         public OperationFunc myFunc;
         public override States Parse(char currChar)
         {
             if (Possible = Complete = myFunc == null & Operations.TryGetValue(currChar, out var result))
             {
+                op = currChar;
                 (myFunc, Priority) = result;
                 return States.Valid;
             }
@@ -49,14 +50,19 @@ namespace MathLibrary
         {
             Operation copy = new Operation();
             CloneLogic(copy);
+            copy.op = op;
             copy.myFunc = myFunc;
-
             return copy;
         }
 
         public override float Compute(Token nextToken, float currentValue)
         {
             return myFunc.Invoke(currentValue, ((Number)nextToken).Num);
+        }
+
+        public override void Print()
+        {
+            Console.Write(op);
         }
     }
 }

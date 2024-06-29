@@ -1,17 +1,19 @@
-﻿using System.Numerics;
+﻿using System.Globalization;
+using System.Numerics;
 
 namespace MathLibrary
 {
 
     public class Equation
     {
-
+        bool error = false;
         List<Token> equationList = new List<Token>();
         List<Token> checkingTokens = new()
         {
             new Number(),
             new Operation(),
-            new WhiteSpace()
+            new WhiteSpace(),
+            new Error()
         };
         string equation;
         float answer = 0;
@@ -44,7 +46,7 @@ namespace MathLibrary
             for (int j = 0; j < equation.Length; j++)
             {
                 bool allTokensFinished = true;
-                for (int i = 0; i < checkingTokens.Count; i++)
+                for (int i = 0; i < checkingTokens.Count - 1; i++)
                 {
                     if (!checkingTokens[i].Possible)
                     {
@@ -60,7 +62,12 @@ namespace MathLibrary
                         }
                     }
                 }
-                if (allTokensFinished)
+                if (index == -1)
+                {
+                    ((Error)checkingTokens[3]).ErrorString = equation[j].ToString();
+                    index = 3;
+                }
+                else if (allTokensFinished)
                 {
                     ConcludeToken();
                     j--;
@@ -74,7 +81,7 @@ namespace MathLibrary
                     equationList.RemoveAt(i);
                 }
             }
-            ShuntingYard(equationList);
+
 
 
             //if (VerifyTypes())
@@ -94,17 +101,48 @@ namespace MathLibrary
             //    throw new Exception("Invalid Equation");
             //}
 
+            for (int i = 0; i < equationList.Count; i++)
+            {
+                if (equationList[i].GetType() == typeof(Error))
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    error = true;
+                }
+                else
+                {
+                    Console.ForegroundColor = ConsoleColor.White;
+                }
+                equationList[i].Print();
+            }
 
+            Console.WriteLine();
 
-            return answer;
+            //if (equationList.Where(m => m.GetType() == typeof(Error)).Count() >= 0)
+
+            if (!error) return CalcTheYard(ShuntingYard(equationList));
+            else throw new Exception("An Error was found");
+
         }
         public void ConcludeToken()
         {
+            var last = equationList[equationList.Count - 1];
+            if (last.GetType() == typeof(Error))
+            {
+                ((Error)last).ErrorString += ((Error)checkingTokens[index].Clone()).ErrorString;
+            }
+            else if (last.GetType() == checkingTokens[index].GetType())
+            {
+                Error newError = new Error();
+                newError.ErrorString = checkingTokens[index].Clone().ToString();
+
+                equationList.Add()
+            }
             equationList.Add(checkingTokens[index].Clone());
             for (int i = 0; i < checkingTokens.Count; i++)
             {
                 checkingTokens[i].Cleanse();
             }
+            index = -1;
         }
         public bool VerifyTypes()
         {
@@ -117,36 +155,57 @@ namespace MathLibrary
             }
             return true;
         }
-        public float ParseTheYard(List<Token> ParsedList)
+        public float CalcTheYard((List<Number> Numbers, List<Operation> Operations) list)
         {
-            float answer = 0;
+            if (list.Numbers.Count != list.Operations.Count + 1) throw new Exception("Invalid Equation");
 
-            for (int i = 0; i < ParsedList.Count; i++)
+            float answer = list.Numbers[0].Num;
+
+            for (int i = 1, opIndex = 0; i < list.Numbers.Count; i++, opIndex++)
             {
-                if (ParsedList[i] is Operation)
-                {
-
-                }
+                answer = list.Operations[opIndex].Compute(list.Numbers[i], answer);    
             }
 
             return answer;
         }
-        public List<Token> ShuntingYard(List<Token> unParsedList)
+        public (List<Number>, List<Operation>) ShuntingYard(List<Token> unParsedList)
         {
-            List<Token> output = new();
+            //List<Token> output = new();
             Stack<Token> opStack = new();
+            List<Operation> operations = new();
+            List<Number> numbers = new();
 
+            //for (int i = 0; i < unParsedList.Count; i++)
+            //{
+            //    if (unParsedList[i] is Number)
+            //    {
+            //        output.Add(unParsedList[i]);
+            //    }
+            //    else if (unParsedList[i] is Operation)
+            //    {
+            //        if (opStack.Count != 0 && opStack.Peek().Priority >= unParsedList[i].Priority)
+            //        {
+            //            output.Add(opStack.Pop());
+            //        }
+            //        opStack.Push(unParsedList[i]);
+            //    }
+
+            //}
+            //while (opStack.Count > 0)
+            //{
+            //    output.Add(opStack.Pop());
+            //}
             for (int i = 0; i < unParsedList.Count; i++)
             {
                 if (unParsedList[i] is Number)
                 {
-                    output.Add(unParsedList[i]);
+                    numbers.Add((Number)unParsedList[i]);
                 }
                 else if (unParsedList[i] is Operation)
                 {
                     if (opStack.Count != 0 && opStack.Peek().Priority >= unParsedList[i].Priority)
                     {
-                        output.Add(opStack.Pop());
+                        operations.Add((Operation)opStack.Pop());
                     }
                     opStack.Push(unParsedList[i]);
                 }
@@ -154,10 +213,18 @@ namespace MathLibrary
             }
             while (opStack.Count > 0)
             {
-                output.Add(opStack.Pop());
+                if (opStack.Peek().GetType() == typeof(Operation))
+                {
+                    operations.Add((Operation)opStack.Pop());
+                }
+                else if (opStack.Peek().GetType() == typeof(Number))
+                {
+                    numbers.Add((Number)opStack.Pop());
+                }
             }
 
-            return output;
+
+            return (numbers, operations);
         }
     }
 }

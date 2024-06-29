@@ -69,6 +69,15 @@ namespace MathLibrary
         {
             return Num;
         }
+
+        public override void Print()
+        {
+            Console.Write(Num);
+        }
+        public override string ToString()
+        {
+            
+        }
     }
 }
 

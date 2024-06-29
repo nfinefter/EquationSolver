@@ -48,5 +48,7 @@ namespace MathLibrary
         public abstract float Compute(Token nextToken, float currentValue);
 
         public abstract Token Clone();
+
+        public abstract void Print();
     }
 }

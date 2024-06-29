@@ -52,5 +52,9 @@ namespace MathLibrary
             
             return (Possible ? States.Possible : States.None) | (Complete ? States.Complete : States.None);
         }
+
+        public override void Print()
+        {
+        }
     }
 }
