@@ -6,8 +6,10 @@ namespace MathLibrary
 
     public class Equation
     {
+        const int ErrorIndex = 3;
         bool error = false;
         List<Token> equationList = new List<Token>();
+        List<Token> rawList = new List<Token>();
         List<Token> checkingTokens = new()
         {
             new Number(),
@@ -41,7 +43,7 @@ namespace MathLibrary
         //    }
         //    return false;
         //}
-        public float ParseEquation()
+        public bool TryParseEquation(out float answer)
         {
             for (int j = 0; j < equation.Length; j++)
             {
@@ -64,8 +66,8 @@ namespace MathLibrary
                 }
                 if (index == -1)
                 {
-                    ((Error)checkingTokens[3]).ErrorString = equation[j].ToString();
-                    index = 3;
+                    ((Error)checkingTokens[ErrorIndex]).ErrorString = equation[j].ToString();
+                    index = ErrorIndex;
                 }
                 else if (allTokensFinished)
                 {
@@ -73,14 +75,9 @@ namespace MathLibrary
                     j--;
                 }
             }
+
             ConcludeToken();
-            for (int i = 0; i < equationList.Count; i++)
-            {
-                if (equationList[i] is WhiteSpace)
-                {
-                    equationList.RemoveAt(i);
-                }
-            }
+
 
 
 
@@ -114,35 +111,67 @@ namespace MathLibrary
                 }
                 equationList[i].Print();
             }
+            Console.ForegroundColor = ConsoleColor.White;
 
             Console.WriteLine();
 
             //if (equationList.Where(m => m.GetType() == typeof(Error)).Count() >= 0)
 
-            if (!error) return CalcTheYard(ShuntingYard(equationList));
-            else throw new Exception("An Error was found");
+            //if (!error)
+            return CalcTheYard(ShuntingYard(equationList), out answer);
+
+
+            //else throw new Exception("An Error was found");
 
         }
-        public void ConcludeToken()
+        void Cleanse()
         {
-            var last = equationList[equationList.Count - 1];
-            if (last.GetType() == typeof(Error))
-            {
-                ((Error)last).ErrorString += ((Error)checkingTokens[index].Clone()).ErrorString;
-            }
-            else if (last.GetType() == checkingTokens[index].GetType())
-            {
-                Error newError = new Error();
-                newError.ErrorString = checkingTokens[index].Clone().ToString();
-
-                equationList.Add()
-            }
-            equationList.Add(checkingTokens[index].Clone());
             for (int i = 0; i < checkingTokens.Count; i++)
             {
                 checkingTokens[i].Cleanse();
             }
             index = -1;
+        }
+        public void ConcludeToken()
+        {
+
+            //for (int i = 0; i < equationList.Count; i++)
+            //{
+            //    if (equationList[i] is WhiteSpace)
+            //    {
+            //        equationList.RemoveAt(i);
+            //    }
+            //}
+
+            if (index == 2)
+            {
+                Cleanse();
+                return;
+            }
+
+            if (rawList.Count > 0)
+            {
+                var prev = rawList[^1];
+                //if (prev.GetType() == typeof(Error))
+                //{
+                //    ((Error)prev).ErrorString += ((Error)checkingTokens[index].Clone()).ErrorString;
+                //}
+
+                if (prev.GetType() != typeof(Error) && prev.GetType() == checkingTokens[index].GetType())
+                {
+                    Error newError = new Error();
+                    newError.ErrorString = checkingTokens[index].Clone().ToString();
+                    checkingTokens[index = ErrorIndex] = newError;
+                }
+            }
+            if (index != ErrorIndex)
+            {
+                rawList.Add(checkingTokens[index].Clone());
+            }
+                equationList.Add(checkingTokens[index].Clone());
+
+
+            Cleanse();
         }
         public bool VerifyTypes()
         {
@@ -155,18 +184,19 @@ namespace MathLibrary
             }
             return true;
         }
-        public float CalcTheYard((List<Number> Numbers, List<Operation> Operations) list)
+        public bool CalcTheYard((List<Number> Numbers, List<Operation> Operations) list, out float answer)
         {
-            if (list.Numbers.Count != list.Operations.Count + 1) throw new Exception("Invalid Equation");
+            bool success = true;
+            if (list.Numbers.Count != list.Operations.Count + 1) success = false;
 
-            float answer = list.Numbers[0].Num;
+            answer = list.Numbers[0].Num;
 
             for (int i = 1, opIndex = 0; i < list.Numbers.Count; i++, opIndex++)
             {
-                answer = list.Operations[opIndex].Compute(list.Numbers[i], answer);    
+                answer = list.Operations[opIndex].Compute(list.Numbers[i], answer);
             }
 
-            return answer;
+            return success;
         }
         public (List<Number>, List<Operation>) ShuntingYard(List<Token> unParsedList)
         {

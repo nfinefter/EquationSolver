@@ -64,5 +64,9 @@ namespace MathLibrary
         {
             Console.Write(op);
         }
+        public override string ToString()
+        {
+            return $"{op}";
+        }
     }
 }

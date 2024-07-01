@@ -76,7 +76,7 @@ namespace MathLibrary
         }
         public override string ToString()
         {
-            
+            return $"{Num}";   
         }
     }
 }

@@ -44,5 +44,9 @@ namespace MathLibrary
             Console.ForegroundColor = ConsoleColor.Red;
             Console.Write(ErrorString);
         }
+        public override string ToString()
+        {
+            return ErrorString;
+        }
     }
 }
